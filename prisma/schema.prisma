@@ -24,6 +24,7 @@ model User {
   sessions       Session[]
   usage          UserUsage[]
   subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  documents      Document[]
 }
 
 model Account {
@@ -71,4 +72,22 @@ model UserUsage {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, modelId, date])
+}
+
+model Document {
+  id          String    @id @default(cuid())
+  title       String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  versions    Version[]
+}
+
+model Version {
+  id          String   @id @default(cuid())
+  content     String   @db.Text
+  createdAt   DateTime @default(now())
+  documentId  String
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 }
